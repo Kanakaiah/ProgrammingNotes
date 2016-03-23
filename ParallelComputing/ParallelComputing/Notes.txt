@@ -1,0 +1,25 @@
+﻿Source: http://tipsandtricks.runicsoft.com/CSharp/ParallelClass.html
+The Parallel class (living in System.Threading.Tasks) provides three important (static) methods: 
+ - Parallel.Invoke: this method takes an array of delegates and runs them in parallel
+ - Parallel.For: this one works like a for loop, but loop iterations are not executed in sequence but in parallel
+ - Parallel.ForEach: a parallel foreach loop
+
+ - Parallel class never absolutely guarantees that the calls are parallelized, but there is seldom a reason (especially on modern systems) that it might opt to run them in sequence.
+ - Invoke also handles a large input array well, since it will spawn a number of threads and reuse them, and not create a new thread for each delegate, which would result in very high overhead costs for thread creation and deletion
+ - Invoke itself is a synchronous method, it will only return when it has executed all delegates.
+ - When one of the delegates throws an exception, Invoke will still execute all other delegates in its array
+ - All the exceptions thrown by the delegates are bundled in an AggregateException, which Invoke will throw when it finishes
+
+ - Invoke also lets you pass an optional ParallelOptions instance as the first argument.
+	ParallelOptions allows you to do three things:
+	 1. You can set its MaxDegreeOfParallelism property to set the maximum number of threads that Invoke will use
+	 2. You can set its TaskScheduler property, if you have written your own scheduler, which will then be used to decide which delegate to run when and on which thread
+	 3. You can set a CancellationToken
+ - Setting a cancellation token allows you to abort Invoke (remember that when a delegate throws an exception, the exception is swallowed and only rethrown by Invoke after all other delegates have been executed).
+
+
+
+ 
+
+
+
