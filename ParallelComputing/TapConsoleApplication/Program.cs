@@ -31,7 +31,49 @@ namespace TapConsoleApplication
             //var ElapsedTime=With.Benchmark(TaskFactoryTest);
             //Console.WriteLine("Time Elapsed {0}ms", ElapsedTime);
             //5
-            TaskSchedulerTest();
+            //TaskSchedulerTest();
+            //6
+            TaskEnumerationTest();
+
+        }
+
+        private static void TaskEnumerationTest()
+        {
+            var tasks = new List<Task<int>>();
+            var source = new CancellationTokenSource();
+            var token = source.Token;
+            int completedIterations = 0;
+
+            for (int n = 0; n <= 19; n++)
+                tasks.Add(Task.Run(() =>
+                {
+                    int iterations = 0;
+                    for (int ctr = 1; ctr <= 2000000; ctr++)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        iterations++;
+                    }
+                    Interlocked.Increment(ref completedIterations);
+                    if (completedIterations >= 10)
+                        source.Cancel();
+                    return iterations;
+                }, token));
+
+            Console.WriteLine("Waiting for the first 10 tasks to complete...\n");
+            try
+            {
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch (AggregateException)
+            {
+                Console.WriteLine("Status of tasks:\n");
+                Console.WriteLine("{0,10} {1,20} {2,14:N0}", "Task Id",
+                                  "Status", "Iterations");
+                foreach (var t in tasks)
+                    Console.WriteLine("{0,10} {1,20} {2,14}",
+                                      t.Id, t.Status,
+                                      t.Status != TaskStatus.Canceled ? t.Result.ToString("N0") : "n/a");
+            }
 
         }
 
@@ -185,7 +227,6 @@ namespace TapConsoleApplication
             }
 
         }
-
         //An alternative, and the most common way to start a task in the .NET Framework 4, is to call the static TaskFactory.StartNew or TaskFactory<TResult>.StartNew method
         private static void IterationTest2()
         {
@@ -206,7 +247,6 @@ namespace TapConsoleApplication
             Console.WriteLine("Finished {0:N0} iterations.", t.Result);
 
         }
-
         //The most common approach, which is available starting with the .NET Framework 4.5, is to call the static Task.
         //Run<TResult>(Func<TResult>) or Task.Run<TResult>(Func<TResult>, CancellationToken) method.
         private static void IterationTest1()
