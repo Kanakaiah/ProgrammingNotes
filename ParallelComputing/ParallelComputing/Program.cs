@@ -18,6 +18,32 @@ namespace ParallelComputing
             //2
             //ParallelFor();
             //3
+            //ParallelFor1();
+            //4
+            //QuickSortTest();
+            //5
+            /* Output
+            Sequence--Time Taken 8050ms
+            Threading--Time Taken 9664ms
+            Parallel--Time Taken 7181ms
+            */
+
+        }
+
+        private static void QuickSortTest()
+        {
+            // Create an unsorted array of string elements
+            string[] unsorted = { "z", "e", "x", "c", "m", "q", "a" };
+            // Sort the array
+            QuickSort.Quicksort(unsorted, 0, unsorted.Length - 1);
+            for (int i = 0; i < unsorted.Length; i++)
+            {
+                Console.Write(unsorted[i] + " ");
+            }
+        }
+
+        private static void ParallelFor1()
+        {
             long ElapesedTime1 = Common.With.Benchmark(ThreadingForloop.StartSequence);
             long ElapesedTime2 = Common.With.Benchmark(ThreadingForloop.StartThread);
             long ElapesedTime3 = Common.With.Benchmark(ThreadingForloop.StartParallel);
@@ -27,14 +53,7 @@ namespace ParallelComputing
             Console.WriteLine("Threading--Time Taken {0}ms", ElapesedTime2);
             Console.WriteLine("Parallel--Time Taken {0}ms", ElapesedTime3);
 
-            /* Output
-            Sequence--Time Taken 8050ms
-            Threading--Time Taken 9664ms
-            Parallel--Time Taken 7181ms
-            */
-
         }
-
 
         private static void ParallelInvoke()
         {
@@ -95,6 +114,8 @@ namespace ParallelComputing
             Matrices.Print(size, result);
             ;
         }
+
+
         
     }
 }
